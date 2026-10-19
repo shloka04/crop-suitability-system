@@ -1,0 +1,32 @@
+{
+  "suitability_features": [
+    "N",
+    "P",
+    "K",
+    "temperature",
+    "humidity",
+    "ph",
+    "rainfall",
+    "crop_banana",
+    "crop_coconut",
+    "crop_jute",
+    "crop_maize",
+    "crop_rice"
+  ],
+  "recommendation_features": [
+    "N",
+    "P",
+    "K",
+    "temperature",
+    "humidity",
+    "ph",
+    "rainfall"
+  ],
+  "crop_categories": [
+    "banana",
+    "coconut",
+    "jute",
+    "maize",
+    "rice"
+  ]
+}

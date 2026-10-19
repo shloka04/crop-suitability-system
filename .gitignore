@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+env/
+
+# Testing and linting caches
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Derived data: regenerate with `python -m crop_suitability.data`
+data/processed/*
+!data/processed/.gitkeep
+
+# Generated figures and metrics
+reports/figures/*
+!reports/figures/.gitkeep
+reports/metrics.json
+
+# Gradio
+flagged/
+gradio_cached_examples/
+
+# OS and editor noise
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
