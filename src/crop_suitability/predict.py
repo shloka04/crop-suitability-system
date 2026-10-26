@@ -154,8 +154,10 @@ SELF_TEST_CASES: list[dict] = [
     },
     {
         "description": "Favourable for coconut",
-        "data": {"N": 20, "P": 30, "K": 35, "temperature": 28, "humidity": 90,
-                 "ph": 5.8, "rainfall": 1600, "crop": "coconut"},
+        # Rainfall sits inside the training range (coconut rows span 131-226 mm);
+        # the earlier 1600 was far outside anything the models saw.
+        "data": {"N": 20, "P": 30, "K": 35, "temperature": 28, "humidity": 95,
+                 "ph": 6.0, "rainfall": 180, "crop": "coconut"},
     },
 ]
 

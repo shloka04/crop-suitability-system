@@ -52,23 +52,28 @@ advisor = CropAdvisor()
 
 conditions = dict(N=90, P=42, K=43, temperature=25, humidity=80, ph=6.5, rainfall=210)
 
-advisor.check_suitability("rice", **conditions)   # (True, 0.93)
-advisor.recommend_crop(**conditions)              # ('rice', 0.88)
-advisor.rank_crops(**conditions)                  # [('rice', 0.81), ('jute', 0.15), ...]
+advisor.check_suitability("rice", **conditions)   # (False, 0.651)
+advisor.recommend_crop(**conditions)              # ('rice', 0.813)
+advisor.rank_crops(**conditions)                  # [('rice', 0.813), ('jute', 0.154), ...]
 advisor.analyse("rice", **conditions)             # both answers at once
 ```
 
 What it expects:
 
-| Input | What it is | Usual range |
+| Input | What it is | Range in the training data |
 |---|---|---|
-| `N` | Soil nitrogen | 0–150 mg/kg |
-| `P` | Soil phosphorus | 0–150 mg/kg |
-| `K` | Soil potassium | 0–250 mg/kg |
-| `temperature` | Mean temperature | 10–45 °C |
-| `humidity` | Relative humidity | 20–100 % |
-| `ph` | Soil pH | 3.0–10.0 |
-| `rainfall` | Rainfall | 20–300 mm |
+| `N` | Soil nitrogen | 0–120 mg/kg |
+| `P` | Soil phosphorus | 5–95 mg/kg |
+| `K` | Soil potassium | 15–55 mg/kg |
+| `temperature` | Mean temperature | 18.0–29.9 °C |
+| `humidity` | Relative humidity | 55.3–100 % |
+| `ph` | Soil pH | 5.0–7.9 |
+| `rainfall` | Rainfall | 60.7–298.6 mm |
+
+These are the ranges the models actually saw. The Gradio sliders allow wider
+values than this (potassium goes to 250, for instance, where the data stops at
+55), so anything outside the table above is extrapolation and the confidence
+score shouldn't be taken seriously there.
 
 ## How it works
 
@@ -86,7 +91,23 @@ crop_yield.csv            19,689 district-year yield records from Indian states
         +-- recommendation model: soil/weather only            ->  crop name
 ```
 
-Both are LightGBM classifiers. SHAP is used to see which inputs drive a prediction — humidity, temperature, nitrogen and potassium turn out to matter most for suitability.
+Both are LightGBM classifiers, and SHAP shows which inputs actually drive a prediction. The two models turn out to behave very differently.
+
+For the recommendation model, the ordering is what you'd hope: rainfall and potassium dominate, then humidity, phosphorus and nitrogen. It is genuinely reading the growing conditions.
+
+The suitability model is not. Its SHAP values are led by the one-hot crop indicators by about two orders of magnitude:
+
+```
+crop_maize     0.6864
+crop_jute      0.1920
+crop_rice      0.1295
+humidity       0.0062
+ph             0.0054
+temperature    0.0036
+N              0.0035
+```
+
+In other words it decides mostly on *which crop you picked*, barely on the conditions you gave it. That fits the leakage described under Results below: the suitability label comes from the yield side of the join while the features come from the soil side, so the model learns each crop's yield distribution rather than a relationship between conditions and outcome. The SHAP values are the clearest evidence of it.
 
 The yield thresholds come from Indian government and industry crop publications rather than being made up:
 
